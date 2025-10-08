@@ -22,12 +22,20 @@
     table.dataTable { width:100% !important; }
     .badge { display:inline-block; padding:2px 8px; border-radius:999px; background:#f3f4f6; margin-left:6px; font-size:12px; }
     .downloads a { margin-right:12px; }
+    .help { font-size: 0.95rem; cursor:pointer; color:#2563eb; text-decoration:underline; }
+    /* Modal */
+    #entropyModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
+    #entropyModal .content { background:#fff; margin:10% auto; padding:20px; border-radius:12px; width:80%; max-width:600px; }
+    #entropyModal .close { float:right; cursor:pointer; font-weight:bold; }
   </style>
 </head>
 <body>
   <header>
     <h1>MLB 2025 — Outcome Entropy</h1>
-    <p class="muted">Diversity of plate appearance outcomes by player and team (higher = more varied outcomes).</p>
+    <p class="muted">
+      Diversity of plate appearance outcomes by player and team (higher = more varied outcomes).
+      <span class="help" onclick="openModal()">What is entropy?</span>
+    </p>
     <div class="downloads">
       <strong>Download CSVs:</strong>
       <a href="entropy_players.csv" download>Players</a>
@@ -35,7 +43,33 @@
     </div>
   </header>
 
+  <!-- Entropy modal -->
+  <div id="entropyModal">
+    <div class="content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>What is Entropy?</h2>
+      <p>
+        In information theory, entropy measures the uncertainty or unpredictability in a set of outcomes.
+        For baseball, we treat each plate appearance outcome (HR, K, BB, 1B, etc.) as a category.
+      </p>
+      <p>
+        Entropy is computed as:
+        <br><code>H = - Σ (pᵢ * log(pᵢ))</code>
+        <br>where pᵢ is the probability of each outcome.
+      </p>
+      <p>
+        - High entropy → the player produces a wide mix of outcomes, making them less predictable.<br>
+        - Low entropy → the player’s outcomes are concentrated (e.g., mostly strikeouts).
+      </p>
+    </div>
+  </div>
+
   <section class="grid">
+    <div class="card">
+      <h2>Summary</h2>
+      <div id="summary"></div>
+    </div>
+
     <div class="card">
       <h2>Players <span id="players-count" class="badge"></span></h2>
       <table id="players" class="display"></table>
@@ -45,15 +79,15 @@
       <h2>Teams <span id="teams-count" class="badge"></span></h2>
       <table id="teams" class="display"></table>
     </div>
-
-    <div class="card">
-      <h2>Summary</h2>
-      <div id="summary"></div>
-    </div>
   </section>
 
   <script>
-    // ---- CSV loader with cache-buster ----
+    // Modal controls
+    function openModal(){ document.getElementById('entropyModal').style.display='block'; }
+    function closeModal(){ document.getElementById('entropyModal').style.display='none'; }
+    window.onclick = function(e){ if(e.target==document.getElementById('entropyModal')) closeModal(); }
+
+    // CSV loader
     function loadCSV(url) {
       const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
       return new Promise((resolve, reject) => {
@@ -68,7 +102,7 @@
       });
     }
 
-    // ---- DataTable with column-widths based on longest value ----
+    // DataTable with auto-widths
     function renderTable(id, data, columns) {
       const table = $('#' + id).DataTable({
         data,
@@ -84,7 +118,7 @@
           const headerText = String($(this.header()).text() || '');
           const colData = this.data().toArray().map(v => v == null ? '' : String(v));
           const maxLen = Math.max(headerText.length, ...colData.map(s => s.length));
-          $(this.header()).css('width', (maxLen + 2) + 'ch'); // +2ch padding
+          $(this.header()).css('width', (maxLen + 2) + 'ch');
         });
       }
 
@@ -94,19 +128,14 @@
 
     function fmt(n, d=3){ return (n==null || isNaN(n)) ? "" : Number(n).toFixed(d); }
 
-    // ---- Transform teams CSV per your rules ----
-    // remove: team_abbrev, qualified_players
-    // replace: team_name -> team (fallback: team_abbrev -> team_id)
-    // remove underscores from ALL rendered column names
+    // Transform teams CSV
     function transformTeams(rows) {
       return rows.map(r => {
-        const teamVal = r.team ?? r.team_name ?? r.team_abbrev ?? r.team_id ?? "";
+        const teamVal = (r.team ?? r.team_name ?? r.team_abbrev ?? "");
         const out = { team: teamVal };
 
         for (const [k, v] of Object.entries(r)) {
-          if (k === 'team_abbrev' || k === 'qualified_players' || k === 'team_name') continue;
-          if (k === 'team') continue; // already handled above
-          // Convert header: underscores -> spaces
+          if (['team_id','team_abbrev','qualified_players','team_name','team'].includes(k)) continue;
           const prettyKey = k.replace(/_/g, ' ');
           out[prettyKey] = v;
         }
@@ -115,8 +144,9 @@
     }
 
     async function main() {
-      // ---- Players (requires: player, team, PA, AB, entropy) ----
       const players = await loadCSV('entropy_players.csv').catch(() => []);
+      let summaryHTML = '';
+
       if (players.length) {
         document.getElementById('players-count').textContent = players.length + " qualified";
         renderTable('players', players, [
@@ -127,47 +157,37 @@
           { title:'entropy', data:'entropy', render:(d)=>fmt(d) }
         ]);
 
-        // Summary
         const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
         const top = sorted.slice(0,5), bot = sorted.slice(-5).reverse();
         const li = x => `<li>${x.player} (${x.team}) — ${fmt(x.entropy)}</li>`;
-        document.getElementById('summary').innerHTML = `
+        summaryHTML = `
           <p><strong>Qualified players:</strong> ${players.length}</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div><h3 style="margin-top:0;">Top 5 Entropy</h3><ol>${top.map(li).join('')}</ol></div>
             <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${bot.map(li).join('')}</ol></div>
           </div>`;
       } else {
-        document.getElementById('players-count').textContent = "0";
+        summaryHTML = `<p>No player data loaded. Ensure <code>entropy_players.csv</code> is present.</p>`;
       }
 
-      // ---- Teams (optional; render only if file present & non-empty) ----
       let teams = [];
       try { teams = await loadCSV('entropy_teams.csv'); } catch {}
       if (teams.length) {
-        // Transform per your rules
         const teamsT = transformTeams(teams);
-
-        // Build columns from transformed keys
         const keys = Object.keys(teamsT[0]);
         const columns = keys.map(k => ({
-          title: k,          // already has spaces (no underscores)
+          title: k,
           data: k,
-          render: (val) => {
-            // format numbers for entropy-like columns
-            if (typeof val === 'number' && /entropy/i.test(k)) return fmt(val);
-            return val;
-          }
+          render: (val) => (typeof val === 'number' && /entropy/i.test(k)) ? fmt(val) : val
         }));
 
-        // Count teams based on "team" field after transform
         const teamCount = new Set(teamsT.map(t => t.team).filter(Boolean)).size || teamsT.length;
         document.getElementById('teams-count').textContent = teamCount + " teams";
 
         renderTable('teams', teamsT, columns);
-      } else {
-        document.getElementById('teams-count').textContent = "—";
       }
+
+      document.getElementById('summary').innerHTML = summaryHTML;
     }
 
     main();
