@@ -53,23 +53,24 @@
   </section>
 
   <script>
-    // simple CSV loader with cache-buster
+    // ---- CSV loader with cache-buster ----
     function loadCSV(url) {
-      const u = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+      const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
       return new Promise((resolve, reject) => {
-        Papa.parse(u, {
+        Papa.parse(busted, {
           download: true,
           header: true,
           dynamicTyping: true,
           skipEmptyLines: true,
-          complete: res => resolve(res.data || []),
+          complete: r => resolve(r.data || []),
           error: err => reject(err)
         });
       });
     }
 
+    // ---- DataTable with column-widths based on longest value ----
     function renderTable(id, data, columns) {
-      $('#' + id).DataTable({
+      const table = $('#' + id).DataTable({
         data,
         columns,
         pageLength: 25,
@@ -77,13 +78,27 @@
         order: [],
         autoWidth: false
       });
+
+      // Helper: set header width to longest string length in the column (incl. header)
+      function applyColumnWidths() {
+        table.columns().every(function(idx) {
+          const headerText = String($(this.header()).text() || '');
+          // Collect strings from the current page for speed, or switch to this.data() to scan all rows
+          const colData = this.data().toArray().map(v => v == null ? '' : String(v));
+          const maxLen = Math.max(headerText.length, ...colData.map(s => s.length));
+          $(this.header()).css('width', (maxLen + 2) + 'ch'); // +2ch padding
+        });
+      }
+
+      table.on('draw', applyColumnWidths);
+      applyColumnWidths();
     }
 
     function fmt(n, d=3){ return (n==null || isNaN(n)) ? "" : Number(n).toFixed(d); }
 
     async function main() {
-      // ---- Players (REQUIRES headers: player, team, PA, AB, entropy) ----
-      const players = await loadCSV('entropy_players.csv');
+      // ---- Players (requires: player, team, PA, AB, entropy) ----
+      const players = await loadCSV('entropy_players.csv').catch(() => []);
       if (players.length) {
         document.getElementById('players-count').textContent = players.length + " qualified";
         renderTable('players', players, [
@@ -96,8 +111,7 @@
 
         // Summary
         const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
-        const top = sorted.slice(0,5);
-        const bot = sorted.slice(-5).reverse();
+        const top = sorted.slice(0,5), bot = sorted.slice(-5).reverse();
         const li = x => `<li>${x.player} (${x.team}) — ${fmt(x.entropy)}</li>`;
         document.getElementById('summary').innerHTML = `
           <p><strong>Qualified players:</strong> ${players.length}</p>
@@ -109,24 +123,27 @@
         document.getElementById('players-count').textContent = "0";
       }
 
-      // ---- Teams (optional; shown if file present) ----
+      // ---- Teams (optional; render only if file present & non-empty) ----
       let teams = [];
       try { teams = await loadCSV('entropy_teams.csv'); } catch {}
       if (teams.length) {
         document.getElementById('teams-count').textContent =
           new Set(teams.map(t => t.team_abbrev || t.team_name || t.team_id || '')).size + " teams";
 
-        const teamCols = [
-          "team_abbrev","team_name","qualified_players","team_PA",
-          "team_avg_entropy","team_pa_weighted_entropy","team_aggregate_entropy"
-        ].filter(c => teams[0]?.hasOwnProperty(c))
-         .map(c => ({ title:c, data:c, render: (v)=> (String(c).includes('entropy') ? fmt(v) : v) }));
+        // Build columns dynamically from keys in first row
+        const keys = Object.keys(teams[0]);
+        const columns = keys.map(k => ({
+          title: k,
+          data: k,
+          render: (val) => (String(k).toLowerCase().includes('entropy') ? fmt(val) : val)
+        }));
 
-        renderTable('teams', teams, teamCols);
+        renderTable('teams', teams, columns);
       } else {
         document.getElementById('teams-count').textContent = "—";
       }
     }
+
     main();
   </script>
 </body>
