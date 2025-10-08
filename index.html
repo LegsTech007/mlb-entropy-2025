@@ -17,23 +17,100 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
-    h1 { margin-bottom: 4px; }
-    .muted { color:#666; margin-top:0; }
-    .grid { display:grid; gap:32px; }
-    .card { background:#fff; border:1px solid #eee; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,.03); }
-    table.dataTable { width:100% !important; }
-    .badge { display:inline-block; padding:2px 8px; border-radius:999px; background:#f3f4f6; margin-left:6px; font-size:12px; }
-    .downloads a { margin-right:12px; }
-    .help { font-size: 0.95rem; cursor:pointer; color:#2563eb; text-decoration:underline; }
-    /* Modal */
-    #entropyModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index: 9999; }
-    #entropyModal .content { background:#fff; margin:5% auto; padding:20px; border-radius:12px; width:90%; max-width:900px; }
-    #entropyModal .close { float:right; cursor:pointer; font-weight:bold; }
-    #modal-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    @media (max-width: 900px) {
-      #modal-grid { grid-template-columns: 1fr; }
+    :root{
+      --bg: #0b1020;
+      --bg-soft: #11162a;
+      --card: #171e35;
+      --text: #e8ecf8;
+      --muted: #a9b1c7;
+      --accent: #4f8cff;     /* electric blue */
+      --accent-2: #ff4664;   /* baseball red */
+      --border: #23305a;
+      --chip: #1e2748;
     }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(79,140,255,0.18), transparent 60%),
+        radial-gradient(1000px 600px at 110% 10%, rgba(255,70,100,0.13), transparent 60%),
+        var(--bg);
+    }
+    header {
+      padding: 28px 24px 8px 24px;
+      border-bottom: 1px solid var(--border);
+      background:
+        linear-gradient(90deg, rgba(79,140,255,0.1), rgba(255,70,100,0.04) 60%, transparent);
+    }
+    h1 { margin: 0 0 6px 0; letter-spacing: .2px; }
+    .muted { color: var(--muted); margin: 8px 0 0 0; }
+    .downloads { margin-top: 12px; }
+    .downloads a {
+      color: var(--text);
+      background: var(--chip);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      text-decoration: none;
+      margin-right: 10px;
+      font-size: 0.92rem;
+    }
+    .help {
+      font-size: .98rem; cursor:pointer; color: var(--accent);
+      text-decoration: underline dotted; text-underline-offset: 3px;
+    }
+
+    .container { padding: 22px; }
+
+    .grid { display: grid; gap: 24px; }
+    @media (min-width: 980px){ .grid { grid-template-columns: 1.2fr 1fr; } }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0) 60%), var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .badge {
+      display:inline-block; padding: 3px 10px; border-radius: 999px;
+      background: var(--chip); border: 1px solid var(--border); margin-left: 8px; color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* DataTables skin tweaks */
+    table.dataTable { width:100% !important; color: var(--text); }
+    table.dataTable thead th { background: #121833; color: #d7def2; border-bottom: 1px solid var(--border); }
+    table.dataTable tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    table.dataTable tbody tr:hover { background: rgba(79,140,255,0.08); }
+    .dataTables_wrapper .dataTables_paginate .paginate_button { color: var(--text) !important; }
+    .dataTables_wrapper .dataTables_length label, .dataTables_wrapper .dataTables_filter label { color: var(--muted); }
+
+    /* Modal */
+    #entropyModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index: 9999; }
+    #entropyModal .content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: min(1100px, 92vw);
+      margin: 5vh auto;
+      padding: 20px 20px 26px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    #entropyModal .close { float:right; cursor:pointer; font-weight:700; color: var(--muted); }
+    #modal-grid { display:grid; gap: 22px; grid-template-columns: 1.1fr 1fr; }
+    @media (max-width: 980px){ #modal-grid { grid-template-columns: 1fr; } }
+    .chart-wrap {
+      background: #0d1430; border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    .chart-title { margin: 0 0 8px 6px; color: #cfe1ff; }
+    .chart-sub { margin: 0 0 10px 6px; color: var(--muted); font-size: .92rem; }
   </style>
 </head>
 <body>
@@ -51,51 +128,55 @@
   </header>
 
   <!-- Entropy modal -->
-  <div id="entropyModal">
+  <div id="entropyModal" role="dialog" aria-label="Entropy explanation">
     <div class="content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2>What is Entropy?</h2>
+      <span class="close" onclick="closeModal()" aria-label="Close">&times;</span>
+      <h2 style="margin:4px 0 12px 0;">What is Entropy?</h2>
       <div id="modal-grid">
         <div>
           <p>
-            In information theory, entropy measures the uncertainty or unpredictability in a set of outcomes.
-            For baseball, we treat each plate appearance outcome (HR, K, BB, 1B, etc.) as a category.
+            In information theory, <em>entropy</em> measures unpredictability in outcomes.
+            For baseball, we consider each plate appearance (PA) outcome (HR, K, BB, 1B, etc.) as a category.
           </p>
           <p>
-            Entropy is computed as:
-            <br><code>H = - Σ (pᵢ · log(pᵢ))</code>, where pᵢ is the probability of each outcome.
+            Entropy (in nats) is:
+            <br><code>H = - Σ (pᵢ · ln(pᵢ))</code>, where <code>pᵢ</code> is the frequency of each outcome.
           </p>
           <p>
-            • High entropy → the player produces a wide mix of outcomes (less predictable).<br>
-            • Low entropy → outcomes are concentrated (e.g., mostly strikeouts or mostly singles).
+            • <strong>High entropy</strong> → a wide mix of outcomes (harder to predict).<br>
+            • <strong>Low entropy</strong> → outcomes cluster into a few types (more predictable).
           </p>
           <p class="muted" style="font-size:0.95rem;">
-            This chart shows the distribution of player entropies from your current CSV.
+            Below is the distribution of player entropies from your current dataset.
           </p>
         </div>
-        <div>
-          <canvas id="entropyHistogram" height="240"></canvas>
+        <div class="chart-wrap">
+          <h3 class="chart-title">Distribution of Player Outcome Entropy (2025)</h3>
+          <div class="chart-sub">Bins = 20 · Units = nats (natural log)</div>
+          <canvas id="entropyHistogram" height="280" aria-label="Histogram of player entropies"></canvas>
         </div>
       </div>
     </div>
   </div>
 
-  <section class="grid">
-    <div class="card">
-      <h2>Summary</h2>
-      <div id="summary"></div>
-    </div>
+  <div class="container">
+    <section class="grid">
+      <div class="card full">
+        <h2 style="margin:4px 0 10px 0;">Summary</h2>
+        <div id="summary"></div>
+      </div>
 
-    <div class="card">
-      <h2>Players <span id="players-count" class="badge"></span></h2>
-      <table id="players" class="display"></table>
-    </div>
+      <div class="card">
+        <h2>Players <span id="players-count" class="badge"></span></h2>
+        <table id="players" class="display"></table>
+      </div>
 
-    <div class="card">
-      <h2>Teams <span id="teams-count" class="badge"></span></h2>
-      <table id="teams" class="display"></table>
-    </div>
-  </section>
+      <div class="card">
+        <h2>Teams <span id="teams-count" class="badge"></span></h2>
+        <table id="teams" class="display"></table>
+      </div>
+    </section>
+  </div>
 
   <script>
     // Modal controls
@@ -118,12 +199,13 @@
       });
     }
 
-    // DataTable with auto-widths
+    // DataTable with auto-widths; default 10 rows
     function renderTable(id, data, columns) {
       const table = $('#' + id).DataTable({
         data,
         columns,
-        pageLength: 25,
+        pageLength: 10,         // default to 10 rows per your request
+        lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
         deferRender: true,
         order: [],
         autoWidth: false
@@ -144,7 +226,7 @@
 
     function fmt(n, d=3){ return (n==null || isNaN(n)) ? "" : Number(n).toFixed(d); }
 
-    // Transform teams CSV
+    // Transform teams CSV:
     // team = team || team_name || team_abbrev (no team_id fallback)
     // remove underscores from column titles and drop team_id, team_name, team_abbrev, qualified_players
     function transformTeams(rows) {
@@ -190,29 +272,51 @@
     function renderHistogram(values) {
       const { labels, counts } = makeHistogram(values, 20);
       const ctx = document.getElementById('entropyHistogram').getContext('2d');
-      if (histogramChart) {
-        histogramChart.destroy();
-      }
+      if (histogramChart) histogramChart.destroy();
+
       histogramChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels,
+          labels,
           datasets: [{
-            label: 'Players',
-            data: counts
-            // no explicit colors/styles per your preference
+            label: 'Players per bin',
+            data: counts,
+            backgroundColor: 'rgba(79, 140, 255, 0.65)',
+            borderColor: 'rgba(79, 140, 255, 1)',
+            borderWidth: 1.2
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: { ticks: { maxRotation: 45, minRotation: 0 } },
-            y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+            x: {
+              title: { display: true, text: 'Outcome entropy (nats)', color: '#cfe1ff' },
+              ticks: { color: '#cfe1ff' },
+              grid: { color: 'rgba(255,255,255,0.06)' }
+            },
+            y: {
+              title: { display: true, text: 'Player count', color: '#cfe1ff' },
+              beginAtZero: true,
+              ticks: { color: '#cfe1ff' },
+              grid: { color: 'rgba(255,255,255,0.06)' }
+            }
           },
           plugins: {
             legend: { display: false },
-            tooltip: { mode: 'index', intersect: false }
+            tooltip: { mode: 'index', intersect: false },
+            title: {
+              display: true,
+              text: 'Histogram of Player Entropies',
+              color: '#e8ecf8',
+              padding: { top: 4, bottom: 6 }
+            },
+            subtitle: {
+              display: true,
+              text: 'Computed from current entropy_players.csv',
+              color: '#a9b1c7',
+              padding: { bottom: 8 }
+            }
           }
         }
       });
@@ -233,7 +337,6 @@
           { title:'entropy', data:'entropy', render:(d)=>fmt(d) }
         ]);
 
-        // Summary
         const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
         const top = sorted.slice(0,5), bot = sorted.slice(-5).reverse();
         const li = x => `<li>${x.player} (${x.team}) — ${fmt(x.entropy)}</li>`;
@@ -244,10 +347,7 @@
             <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${bot.map(li).join('')}</ol></div>
           </div>`;
 
-        // Prepare histogram values and render in modal
-        const entropyValues = players
-          .map(p => Number(p.entropy))
-          .filter(v => Number.isFinite(v));
+        const entropyValues = players.map(p => Number(p.entropy)).filter(Number.isFinite);
         renderHistogram(entropyValues);
 
       } else {
@@ -255,15 +355,14 @@
         summaryHTML = `<p>No player data loaded. Ensure <code>entropy_players.csv</code> is present.</p>`;
       }
 
-      // ---- Teams (optional; render only if file present & non-empty) ----
+      // ---- Teams (optional; render only if present & non-empty) ----
       let teams = [];
       try { teams = await loadCSV('entropy_teams.csv'); } catch {}
       if (teams.length) {
         const teamsT = transformTeams(teams);
         const keys = Object.keys(teamsT[0]);
         const columns = keys.map(k => ({
-          title: k,          // underscores replaced with spaces already
-          data: k,
+          title: k, data: k,
           render: (val) => (typeof val === 'number' && /entropy/i.test(k)) ? fmt(val) : val
         }));
 
@@ -275,7 +374,6 @@
         document.getElementById('teams-count').textContent = "—";
       }
 
-      // Inject summary at the top
       document.getElementById('summary').innerHTML = summaryHTML;
     }
 
