@@ -13,6 +13,9 @@
   <!-- Papa Parse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
+  <!-- Chart.js (for the histogram in the modal) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
     h1 { margin-bottom: 4px; }
@@ -24,9 +27,13 @@
     .downloads a { margin-right:12px; }
     .help { font-size: 0.95rem; cursor:pointer; color:#2563eb; text-decoration:underline; }
     /* Modal */
-    #entropyModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
-    #entropyModal .content { background:#fff; margin:10% auto; padding:20px; border-radius:12px; width:80%; max-width:600px; }
+    #entropyModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index: 9999; }
+    #entropyModal .content { background:#fff; margin:5% auto; padding:20px; border-radius:12px; width:90%; max-width:900px; }
     #entropyModal .close { float:right; cursor:pointer; font-weight:bold; }
+    #modal-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 900px) {
+      #modal-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -48,19 +55,28 @@
     <div class="content">
       <span class="close" onclick="closeModal()">&times;</span>
       <h2>What is Entropy?</h2>
-      <p>
-        In information theory, entropy measures the uncertainty or unpredictability in a set of outcomes.
-        For baseball, we treat each plate appearance outcome (HR, K, BB, 1B, etc.) as a category.
-      </p>
-      <p>
-        Entropy is computed as:
-        <br><code>H = - Σ (pᵢ * log(pᵢ))</code>
-        <br>where pᵢ is the probability of each outcome.
-      </p>
-      <p>
-        - High entropy → the player produces a wide mix of outcomes, making them less predictable.<br>
-        - Low entropy → the player’s outcomes are concentrated (e.g., mostly strikeouts).
-      </p>
+      <div id="modal-grid">
+        <div>
+          <p>
+            In information theory, entropy measures the uncertainty or unpredictability in a set of outcomes.
+            For baseball, we treat each plate appearance outcome (HR, K, BB, 1B, etc.) as a category.
+          </p>
+          <p>
+            Entropy is computed as:
+            <br><code>H = - Σ (pᵢ · log(pᵢ))</code>, where pᵢ is the probability of each outcome.
+          </p>
+          <p>
+            • High entropy → the player produces a wide mix of outcomes (less predictable).<br>
+            • Low entropy → outcomes are concentrated (e.g., mostly strikeouts or mostly singles).
+          </p>
+          <p class="muted" style="font-size:0.95rem;">
+            This chart shows the distribution of player entropies from your current CSV.
+          </p>
+        </div>
+        <div>
+          <canvas id="entropyHistogram" height="240"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -129,6 +145,8 @@
     function fmt(n, d=3){ return (n==null || isNaN(n)) ? "" : Number(n).toFixed(d); }
 
     // Transform teams CSV
+    // team = team || team_name || team_abbrev (no team_id fallback)
+    // remove underscores from column titles and drop team_id, team_name, team_abbrev, qualified_players
     function transformTeams(rows) {
       return rows.map(r => {
         const teamVal = (r.team ?? r.team_name ?? r.team_abbrev ?? "");
@@ -143,7 +161,65 @@
       });
     }
 
+    // Build a histogram dataset from numeric array
+    function makeHistogram(values, binCount = 20) {
+      if (!values.length) return { labels: [], counts: [] };
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const eps = 1e-9;
+      const width = (max - min) > 0 ? (max - min) / binCount : 1;
+      const edges = Array.from({length: binCount+1}, (_, i) => min + i*width + (i===binCount?eps:0));
+      const counts = Array(binCount).fill(0);
+      values.forEach(v => {
+        if (!Number.isFinite(v)) return;
+        let idx = Math.floor((v - min) / width);
+        if (idx < 0) idx = 0;
+        if (idx >= binCount) idx = binCount - 1;
+        counts[idx] += 1;
+      });
+      const labels = counts.map((_, i) => {
+        const a = edges[i];
+        const b = edges[i+1] - eps;
+        return `${a.toFixed(2)}–${b.toFixed(2)}`;
+      });
+      return { labels, counts };
+    }
+
+    let histogramChart = null;
+
+    function renderHistogram(values) {
+      const { labels, counts } = makeHistogram(values, 20);
+      const ctx = document.getElementById('entropyHistogram').getContext('2d');
+      if (histogramChart) {
+        histogramChart.destroy();
+      }
+      histogramChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Players',
+            data: counts
+            // no explicit colors/styles per your preference
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { maxRotation: 45, minRotation: 0 } },
+            y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false }
+          }
+        }
+      });
+    }
+
     async function main() {
+      // ---- Players (requires: player, team, PA, AB, entropy) ----
       const players = await loadCSV('entropy_players.csv').catch(() => []);
       let summaryHTML = '';
 
@@ -157,6 +233,7 @@
           { title:'entropy', data:'entropy', render:(d)=>fmt(d) }
         ]);
 
+        // Summary
         const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
         const top = sorted.slice(0,5), bot = sorted.slice(-5).reverse();
         const li = x => `<li>${x.player} (${x.team}) — ${fmt(x.entropy)}</li>`;
@@ -166,17 +243,26 @@
             <div><h3 style="margin-top:0;">Top 5 Entropy</h3><ol>${top.map(li).join('')}</ol></div>
             <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${bot.map(li).join('')}</ol></div>
           </div>`;
+
+        // Prepare histogram values and render in modal
+        const entropyValues = players
+          .map(p => Number(p.entropy))
+          .filter(v => Number.isFinite(v));
+        renderHistogram(entropyValues);
+
       } else {
+        document.getElementById('players-count').textContent = "0";
         summaryHTML = `<p>No player data loaded. Ensure <code>entropy_players.csv</code> is present.</p>`;
       }
 
+      // ---- Teams (optional; render only if file present & non-empty) ----
       let teams = [];
       try { teams = await loadCSV('entropy_teams.csv'); } catch {}
       if (teams.length) {
         const teamsT = transformTeams(teams);
         const keys = Object.keys(teamsT[0]);
         const columns = keys.map(k => ({
-          title: k,
+          title: k,          // underscores replaced with spaces already
           data: k,
           render: (val) => (typeof val === 'number' && /entropy/i.test(k)) ? fmt(val) : val
         }));
@@ -185,8 +271,11 @@
         document.getElementById('teams-count').textContent = teamCount + " teams";
 
         renderTable('teams', teamsT, columns);
+      } else {
+        document.getElementById('teams-count').textContent = "—";
       }
 
+      // Inject summary at the top
       document.getElementById('summary').innerHTML = summaryHTML;
     }
 
