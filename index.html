@@ -79,11 +79,9 @@
         autoWidth: false
       });
 
-      // Helper: set header width to longest string length in the column (incl. header)
       function applyColumnWidths() {
-        table.columns().every(function(idx) {
+        table.columns().every(function() {
           const headerText = String($(this.header()).text() || '');
-          // Collect strings from the current page for speed, or switch to this.data() to scan all rows
           const colData = this.data().toArray().map(v => v == null ? '' : String(v));
           const maxLen = Math.max(headerText.length, ...colData.map(s => s.length));
           $(this.header()).css('width', (maxLen + 2) + 'ch'); // +2ch padding
@@ -95,6 +93,26 @@
     }
 
     function fmt(n, d=3){ return (n==null || isNaN(n)) ? "" : Number(n).toFixed(d); }
+
+    // ---- Transform teams CSV per your rules ----
+    // remove: team_abbrev, qualified_players
+    // replace: team_name -> team (fallback: team_abbrev -> team_id)
+    // remove underscores from ALL rendered column names
+    function transformTeams(rows) {
+      return rows.map(r => {
+        const teamVal = r.team ?? r.team_name ?? r.team_abbrev ?? r.team_id ?? "";
+        const out = { team: teamVal };
+
+        for (const [k, v] of Object.entries(r)) {
+          if (k === 'team_abbrev' || k === 'qualified_players' || k === 'team_name') continue;
+          if (k === 'team') continue; // already handled above
+          // Convert header: underscores -> spaces
+          const prettyKey = k.replace(/_/g, ' ');
+          out[prettyKey] = v;
+        }
+        return out;
+      });
+    }
 
     async function main() {
       // ---- Players (requires: player, team, PA, AB, entropy) ----
@@ -127,18 +145,26 @@
       let teams = [];
       try { teams = await loadCSV('entropy_teams.csv'); } catch {}
       if (teams.length) {
-        document.getElementById('teams-count').textContent =
-          new Set(teams.map(t => t.team_abbrev || t.team_name || t.team_id || '')).size + " teams";
+        // Transform per your rules
+        const teamsT = transformTeams(teams);
 
-        // Build columns dynamically from keys in first row
-        const keys = Object.keys(teams[0]);
+        // Build columns from transformed keys
+        const keys = Object.keys(teamsT[0]);
         const columns = keys.map(k => ({
-          title: k,
+          title: k,          // already has spaces (no underscores)
           data: k,
-          render: (val) => (String(k).toLowerCase().includes('entropy') ? fmt(val) : val)
+          render: (val) => {
+            // format numbers for entropy-like columns
+            if (typeof val === 'number' && /entropy/i.test(k)) return fmt(val);
+            return val;
+          }
         }));
 
-        renderTable('teams', teams, columns);
+        // Count teams based on "team" field after transform
+        const teamCount = new Set(teamsT.map(t => t.team).filter(Boolean)).size || teamsT.length;
+        document.getElementById('teams-count').textContent = teamCount + " teams";
+
+        renderTable('teams', teamsT, columns);
       } else {
         document.getElementById('teams-count').textContent = "—";
       }
