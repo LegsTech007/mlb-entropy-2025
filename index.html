@@ -1,153 +1,132 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>MLB 2025 — Outcome Entropy</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-
-  <!-- DataTables (sortable/searchable tables) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-dt@2/css/dataTables.dataTables.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/datatables.net@2/js/dataTables.min.js"></script>
-
-  <!-- Papa Parse (fast CSV loader) -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
-    h1 { margin-bottom: 4px; }
-    .muted { color: #666; margin-top: 0; }
-    .grid { display: grid; gap: 32px; }
-    .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
-    table.dataTable { width: 100% !important; }
-    .badge { display:inline-block; padding: 2px 8px; border-radius: 999px; background:#f3f4f6; margin-left:6px; font-size:12px;}
-    .downloads a { margin-right: 12px; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>MLB 2025 — Outcome Entropy</h1>
-    <p class="muted">Diversity of plate appearance outcomes per player and team (higher = more varied outcomes).</p>
-    <div class="downloads">
-      <strong>Download CSVs:</strong>
-      <a href="entropy_players.csv" download>Players</a>
-      <a href="entropy_teams.csv" download>Teams</a>
-    </div>
-  </header>
-
-  <section class="grid">
-    <div class="card">
-      <h2>Players <span id="players-count" class="badge"></span></h2>
-      <table id="players" class="display"></table>
-    </div>
-
-    <div class="card">
-      <h2>Teams <span id="teams-count" class="badge"></span></h2>
-      <table id="teams" class="display"></table>
-    </div>
-
-    <div class="card">
-      <h2>Summary</h2>
-      <div id="summary"></div>
-    </div>
-  </section>
-
-  <script>
-    function loadCSV(url) {
-      return new Promise((resolve, reject) => {
-        Papa.parse(url, {
-          download: true,
-          header: true,
-          dynamicTyping: true,
-          skipEmptyLines: true,
-          complete: results => resolve(results.data),
-          error: err => reject(err)
-        });
+<script>
+  function loadCSV(url) {
+    // cache-bust so GitHub Pages/CDN doesn't serve an old CSV
+    const withBuster = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+    return new Promise((resolve, reject) => {
+      Papa.parse(withBuster, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: (results) => resolve(results.data || []),
+        error: (err) => reject(err)
       });
+    });
+  }
+
+  // normalize keys to lower-case, trimmed
+  function normalizeKeys(rows) {
+    return rows.map(row =>
+      Object.fromEntries(
+        Object.entries(row).map(([k, v]) => [String(k).trim().toLowerCase(), v])
+      )
+    );
+  }
+
+  function firstNonEmpty(row, keys) {
+    for (const k of keys) {
+      const v = row[k];
+      if (v !== undefined && v !== null && String(v).trim() !== "") return v;
+    }
+    return "";
+  }
+
+  function num(row, ...keys) {
+    const v = firstNonEmpty(row, keys);
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function renderTable(elemId, data, columns) {
+    const $table = $('#' + elemId);
+    $table.DataTable({
+      data,
+      columns,
+      pageLength: 25,
+      deferRender: true,
+      order: [],
+      autoWidth: false
+    });
+  }
+
+  function fmt(n, d=3) {
+    if (n === null || n === undefined || isNaN(n)) return '';
+    return Number(n).toFixed(d);
+  }
+
+  async function main() {
+    // Load and normalize
+    const rawPlayers = await loadCSV('entropy_players.csv').catch(() => []);
+    const rawTeams   = await loadCSV('entropy_teams.csv').catch(() => []);
+    const playersN   = normalizeKeys(rawPlayers);
+    const teamsN     = normalizeKeys(rawTeams);
+
+    // Build a clean players array with canonical fields
+    const players = playersN.map(r => ({
+      player:  firstNonEmpty(r, ['player','player_name']),
+      team:    firstNonEmpty(r, ['team','team_abbrev','team_name','team_id']),
+      PA:      num(r, 'pa', 'PA'),
+      AB:      num(r, 'ab', 'AB'),
+      entropy: num(r, 'entropy')
+    })).filter(p => p.player !== ""); // keep only rows with a name
+
+    // Debug (optional): see what keys exist if still empty
+    // console.log("Players sample row:", playersN[0]); 
+
+    if (players.length) {
+      document.getElementById('players-count').textContent = players.length + " qualified";
+      const playerCols = [
+        { title: 'player',  data: 'player' },
+        { title: 'team',    data: 'team' },
+        { title: 'PA',      data: 'PA' },
+        { title: 'AB',      data: 'AB' },
+        { title: 'entropy', data: 'entropy', render: (d)=>fmt(d) }
+      ];
+      renderTable('players', players, playerCols);
+    } else {
+      document.querySelector('div.card:nth-of-type(1)').innerHTML += "<p>No player results found. Check CSV headers.</p>";
     }
 
-    function renderTable(elemId, data, columns) {
-      const $table = $('#' + elemId);
-      // Build header automatically if not provided
-      if (!columns) {
-        const cols = Object.keys(data[0] || {}).map(k => ({ title: k, data: k }));
-        columns = cols;
-      }
-      $table.DataTable({
-        data,
-        columns,
-        pageLength: 25,
-        deferRender: true,
-        order: [], // no default sort
-        autoWidth: false
-      });
+    if (teamsN.length) {
+      document.getElementById('teams-count').textContent =
+        new Set(teamsN.map(t => (t.team_abbrev || t.team_name || t.team_id || '')).filter(Boolean)).size + " teams";
+
+      const teams = teamsN; // already normalized; rely on your CSV headers
+      const teamCols = [
+        'team_abbrev','team_name','qualified_players','team_pa',
+        'team_avg_entropy','team_pa_weighted_entropy','team_aggregate_entropy'
+      ].filter(c => teams[0]?.hasOwnProperty(c))
+       .map(c => ({
+         title: c,
+         data: c,
+         render: (val) => (String(c).includes('entropy') ? fmt(val) : val)
+       }));
+
+      renderTable('teams', teams, teamCols);
+    } else {
+      document.querySelector('div.card:nth-of-type(2)').innerHTML += "<p>No team results found.</p>";
     }
 
-    function fmt(n, d=3) {
-      if (n === null || n === undefined || isNaN(n)) return '';
-      return Number(n).toFixed(d);
+    // Summary card
+    const summary = document.getElementById('summary');
+    if (players.length) {
+      const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
+      const top = sorted.slice(0,5);
+      const bot = sorted.slice(-5).reverse();
+      const topList = top.map(p => `<li>${p.player} (${p.team}) — ${fmt(p.entropy)}</li>`).join('');
+      const botList = bot.map(p => `<li>${p.player} (${p.team}) — ${fmt(p.entropy)}</li>`).join('');
+      summary.innerHTML = `
+        <p><strong>Qualified players:</strong> ${players.length}</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div><h3 style="margin-top:0;">Top 5 Entropy</h3><ol>${topList}</ol></div>
+          <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${botList}</ol></div>
+        </div>
+        <p class="muted">Accepts either <code>player</code> or <code>player_name</code> in the CSV.</p>
+      `;
+    } else {
+      summary.innerHTML = `<p>Populate <code>entropy_players.csv</code> to see summaries.</p>`;
     }
+  }
 
-    async function main() {
-      // Load both CSVs; if teams is missing, we just skip rendering it
-      const players = await loadCSV('entropy_players.csv').catch(() => []);
-      const teams = await loadCSV('entropy_teams.csv').catch(() => []);
-
-      // Players table
-      if (players.length) {
-        document.getElementById('players-count').textContent = players.length + " qualified";
-        // Nice column order if present
-        const playerCols = ["player","team","PA","AB","entropy"]
-            .filter(c => players[0]?.hasOwnProperty(c))
-            .map(c => ({
-                title: c,
-                data: c,
-                render: (data) => (c === "entropy" ? fmt(data) : data)
-            }));  
-        renderTable('players', players, playerCols);
-      } else {
-        document.querySelector('div.card:nth-of-type(1)').innerHTML += "<p>No player results found.</p>";
-      }
-
-      // Teams table
-      if (teams.length) {
-        document.getElementById('teams-count').textContent = new Set(teams.map(t => t.team_abbrev)).size + " teams";
-        const teamCols = [
-          "team_abbrev","team_name","qualified_players","team_PA",
-          "team_avg_entropy","team_pa_weighted_entropy","team_aggregate_entropy"
-        ].filter(c => teams[0].hasOwnProperty(c))
-         .map(c => ({
-            title: c,
-            data: c,
-            render: (data) => (String(c).includes("entropy") ? fmt(data) : data)
-         }));
-        renderTable('teams', teams, teamCols);
-      } else {
-        document.querySelector('div.card:nth-of-type(2)').innerHTML += "<p>No team results found.</p>";
-      }
-
-      // Summary card (simple highlights)
-      const summary = document.getElementById('summary');
-      if (players.length) {
-        const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
-        const top = sorted.slice(0,5);
-        const bot = sorted.slice(-5).reverse();
-        const topList = top.map(p => `<li>${p.player_name} (${p.team_abbrev}) — ${fmt(p.entropy)}</li>`).join('');
-        const botList = bot.map(p => `<li>${p.player_name} (${p.team_abbrev}) — ${fmt(p.entropy)}</li>`).join('');
-        summary.innerHTML = `
-          <p><strong>Qualified players:</strong> ${players.length}</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div><h3 style="margin-top:0;">Top 5 Entropy</h3><ol>${topList}</ol></div>
-            <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${botList}</ol></div>
-          </div>
-          <p class="muted">Entropy is Shannon entropy of PA outcomes (using <code>event</code>). Higher = more varied outcomes.</p>
-        `;
-      } else {
-        summary.innerHTML = `<p>Populate <code>entropy_players.csv</code> to see summaries.</p>`;
-      }
-    }
-
-    main();
-  </script>
-</body>
-</html>
+  main();
+</script>
