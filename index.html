@@ -127,6 +127,94 @@
       summary.innerHTML = `<p>Populate <code>entropy_players.csv</code> to see summaries.</p>`;
     }
   }
+<div id="debug" style="font:12px/1.4 system-ui; color:#444; margin:8px 0;"></div>
+<script>
+  // --- helpers (robust) ---
+  function stripBOM(s){ return typeof s==='string' ? s.replace(/^\uFEFF/, '') : s; }
+
+  function papa(url) {
+    const bust = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+    return new Promise((resolve, reject) => {
+      Papa.parse(bust, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: r => resolve(r.data || []),
+        error: err => reject(err)
+      });
+    });
+  }
+
+  function normalizeKeys(rows) {
+    return rows.map(row => {
+      const out = {};
+      for (const [k, v] of Object.entries(row)) {
+        const nk = stripBOM(String(k)).trim().toLowerCase(); // strip BOM + trim + lowercase
+        out[nk] = v;
+      }
+      return out;
+    });
+  }
+
+  function firstNonEmpty(row, keys) {
+    for (const k of keys) {
+      const v = row[k];
+      if (v !== undefined && v !== null && String(v).trim() !== "") return v;
+    }
+    return "";
+  }
+  function num(v){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+  function fmt(n, d=3){ return n==null ? "" : Number(n).toFixed(d); }
+
+  function renderTable(elemId, data, columns) {
+    if (!$.fn || !$.fn.DataTable) {
+      document.getElementById('debug').innerHTML += "<div style='color:#b91c1c'>DataTables didn't load. Check the CDN URLs.</div>";
+      return;
+    }
+    $('#' + elemId).DataTable({ data, columns, pageLength:25, deferRender:true, order:[], autoWidth:false });
+  }
+
+  async function main() {
+    const debug = document.getElementById('debug');
+
+    // Load your exact filename
+    const playersRaw = await papa('entropy_players.csv').catch(e => {
+      debug.innerHTML += `<div style="color:#b91c1c">Error loading entropy_players.csv: ${e}</div>`;
+      return [];
+    });
+
+    const playersN = normalizeKeys(playersRaw);
+    debug.innerHTML += `<div>Loaded players rows: <b>${playersN.length}</b></div>`;
+    if (playersN[0]) {
+      debug.innerHTML += `<div>First row keys: ${Object.keys(playersN[0]).join(', ')}</div>`;
+    }
+
+    const players = playersN.map(r => ({
+      player:  firstNonEmpty(r, ['player','player_name']),
+      team:    firstNonEmpty(r, ['team','team_abbrev','team_name','team_id']),
+      PA:      num(r['pa']),
+      AB:      num(r['ab']),
+      entropy: num(r['entropy'])
+    })).filter(p => p.player !== "");
+
+    if (players.length === 0) {
+      debug.innerHTML += `<div style="color:#b91c1c">No playable rows after normalization. Check header names and that the CSV isn’t empty.</div>`;
+    } else {
+      document.getElementById('players-count').textContent = players.length + " qualified";
+      renderTable('players', players, [
+        { title: 'player',  data: 'player' },
+        { title: 'team',    data: 'team' },
+        { title: 'PA',      data: 'PA' },
+        { title: 'AB',      data: 'AB' },
+        { title: 'entropy', data: 'entropy', render: d => fmt(d) }
+      ]);
+    }
+  }
+  main();
+</script>
+
+
 
   main();
 </script>
