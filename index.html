@@ -13,20 +13,19 @@
   <!-- Papa Parse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-  <!-- Chart.js (for the histogram in the modal) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
   <style>
     :root{
-      --bg: #0b1020;
-      --bg-soft: #11162a;
-      --card: #171e35;
-      --text: #e8ecf8;
-      --muted: #a9b1c7;
-      --accent: #4f8cff;     /* electric blue */
-      --accent-2: #ff4664;   /* baseball red */
-      --border: #23305a;
-      --chip: #1e2748;
+      --bg: #f6f8ff;
+      --bg-soft: #ffffff;
+      --card: #ffffff;
+      --text: #0f172a;        /* slate-900 */
+      --muted: #475569;       /* slate-600 */
+      --accent: #2563eb;      /* blue-600 */
+      --accent-2: #ef4444;    /* red-500 */
+      --border: #e2e8f0;      /* slate-200 */
+      --chip: #eef2ff;        /* indigo-50 */
+      --thead: #eef2ff;       /* light indigo */
+      --hover: #f1f5ff;       /* very light blue hover */
     }
     * { box-sizing: border-box; }
     body {
@@ -34,15 +33,16 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(1200px 600px at 10% -10%, rgba(79,140,255,0.18), transparent 60%),
-        radial-gradient(1000px 600px at 110% 10%, rgba(255,70,100,0.13), transparent 60%),
+        radial-gradient(1200px 600px at -10% -20%, rgba(37,99,235,0.12), transparent 60%),
+        radial-gradient(900px 600px at 110% 0%, rgba(239,68,68,0.10), transparent 60%),
         var(--bg);
     }
     header {
-      padding: 28px 24px 8px 24px;
+      padding: 28px 24px 18px 24px;
       border-bottom: 1px solid var(--border);
       background:
-        linear-gradient(90deg, rgba(79,140,255,0.1), rgba(255,70,100,0.04) 60%, transparent);
+        linear-gradient(90deg, rgba(37,99,235,0.12), rgba(255,255,255,0) 50%),
+        var(--bg-soft);
     }
     h1 { margin: 0 0 6px 0; letter-spacing: .2px; }
     .muted { color: var(--muted); margin: 8px 0 0 0; }
@@ -55,7 +55,7 @@
       padding: 6px 10px;
       text-decoration: none;
       margin-right: 10px;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
     }
     .help {
       font-size: .98rem; cursor:pointer; color: var(--accent);
@@ -68,49 +68,45 @@
     @media (min-width: 980px){ .grid { grid-template-columns: 1.2fr 1fr; } }
 
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0) 60%), var(--card);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,0.04);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
     }
-
     .full { grid-column: 1 / -1; }
 
     .badge {
       display:inline-block; padding: 3px 10px; border-radius: 999px;
-      background: var(--chip); border: 1px solid var(--border); margin-left: 8px; color: var(--muted);
+      background: #e2e8ff; border: 1px solid var(--border); margin-left: 8px; color: #1e293b;
       font-size: 12px;
     }
 
-    /* DataTables skin tweaks */
+    /* DataTables skin tweaks (light, higher-contrast) */
     table.dataTable { width:100% !important; color: var(--text); }
-    table.dataTable thead th { background: #121833; color: #d7def2; border-bottom: 1px solid var(--border); }
-    table.dataTable tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
-    table.dataTable tbody tr:hover { background: rgba(79,140,255,0.08); }
+    table.dataTable thead th {
+      background: var(--thead);
+      color: #111827;                /* gray-900 */
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+    table.dataTable tbody tr:nth-child(even) { background: #fafbff; }
+    table.dataTable tbody tr:hover { background: var(--hover); }
     .dataTables_wrapper .dataTables_paginate .paginate_button { color: var(--text) !important; }
     .dataTables_wrapper .dataTables_length label, .dataTables_wrapper .dataTables_filter label { color: var(--muted); }
 
-    /* Modal */
-    #entropyModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index: 9999; }
+    /* Modal (no chart, just text) */
+    #entropyModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.25); z-index: 9999; }
     #entropyModal .content {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      width: min(1100px, 92vw);
-      margin: 5vh auto;
-      padding: 20px 20px 26px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      width: min(800px, 92vw);
+      margin: 8vh auto;
+      padding: 20px 22px 24px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.20);
     }
     #entropyModal .close { float:right; cursor:pointer; font-weight:700; color: var(--muted); }
-    #modal-grid { display:grid; gap: 22px; grid-template-columns: 1.1fr 1fr; }
-    @media (max-width: 980px){ #modal-grid { grid-template-columns: 1fr; } }
-    .chart-wrap {
-      background: #0d1430; border: 1px solid var(--border);
-      border-radius: 14px; padding: 14px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
-    }
-    .chart-title { margin: 0 0 8px 6px; color: #cfe1ff; }
-    .chart-sub { margin: 0 0 10px 6px; color: var(--muted); font-size: .92rem; }
   </style>
 </head>
 <body>
@@ -127,35 +123,27 @@
     </div>
   </header>
 
-  <!-- Entropy modal -->
+  <!-- Entropy modal (text only) -->
   <div id="entropyModal" role="dialog" aria-label="Entropy explanation">
     <div class="content">
       <span class="close" onclick="closeModal()" aria-label="Close">&times;</span>
       <h2 style="margin:4px 0 12px 0;">What is Entropy?</h2>
-      <div id="modal-grid">
-        <div>
-          <p>
-            In information theory, <em>entropy</em> measures unpredictability in outcomes.
-            For baseball, we consider each plate appearance (PA) outcome (HR, K, BB, 1B, etc.) as a category.
-          </p>
-          <p>
-            Entropy (in nats) is:
-            <br><code>H = - Σ (pᵢ · ln(pᵢ))</code>, where <code>pᵢ</code> is the frequency of each outcome.
-          </p>
-          <p>
-            • <strong>High entropy</strong> → a wide mix of outcomes (harder to predict).<br>
-            • <strong>Low entropy</strong> → outcomes cluster into a few types (more predictable).
-          </p>
-          <p class="muted" style="font-size:0.95rem;">
-            Below is the distribution of player entropies from your current dataset.
-          </p>
-        </div>
-        <div class="chart-wrap">
-          <h3 class="chart-title">Distribution of Player Outcome Entropy (2025)</h3>
-          <div class="chart-sub">Bins = 20 · Units = nats (natural log)</div>
-          <canvas id="entropyHistogram" height="280" aria-label="Histogram of player entropies"></canvas>
-        </div>
-      </div>
+      <p>
+        In information theory, <strong>entropy</strong> measures unpredictability in outcomes.
+        For baseball, we treat each plate appearance outcome (HR, K, BB, 1B, etc.) as a category and
+        compute how spread out those outcomes are for a player or team.
+      </p>
+      <p>
+        The formula (in natural units, “nats”) is:
+        <br><code>H = - Σ (pᵢ · ln pᵢ)</code>, where <code>pᵢ</code> is the frequency of each outcome.
+      </p>
+      <ul>
+        <li><strong>High entropy</strong>: many different outcomes with similar frequency → less predictable.</li>
+        <li><strong>Low entropy</strong>: outcomes concentrated in a few types → more predictable.</li>
+      </ul>
+      <p class="muted" style="margin-top:8px;">
+        Tip: You can compare players or teams by sorting the “entropy” column in the tables below.
+      </p>
     </div>
   </div>
 
@@ -204,7 +192,7 @@
       const table = $('#' + id).DataTable({
         data,
         columns,
-        pageLength: 10,         // default to 10 rows per your request
+        pageLength: 10,         // default to 10 rows
         lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
         deferRender: true,
         order: [],
@@ -228,97 +216,18 @@
 
     // Transform teams CSV:
     // team = team || team_name || team_abbrev (no team_id fallback)
-    // remove underscores from column titles and drop team_id, team_name, team_abbrev, qualified_players
+    // drop team_id, team_name, team_abbrev, qualified_players
+    // remove underscores from rendered column titles
     function transformTeams(rows) {
       return rows.map(r => {
         const teamVal = (r.team ?? r.team_name ?? r.team_abbrev ?? "");
         const out = { team: teamVal };
-
         for (const [k, v] of Object.entries(r)) {
           if (['team_id','team_abbrev','qualified_players','team_name','team'].includes(k)) continue;
           const prettyKey = k.replace(/_/g, ' ');
           out[prettyKey] = v;
         }
         return out;
-      });
-    }
-
-    // Build a histogram dataset from numeric array
-    function makeHistogram(values, binCount = 20) {
-      if (!values.length) return { labels: [], counts: [] };
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      const eps = 1e-9;
-      const width = (max - min) > 0 ? (max - min) / binCount : 1;
-      const edges = Array.from({length: binCount+1}, (_, i) => min + i*width + (i===binCount?eps:0));
-      const counts = Array(binCount).fill(0);
-      values.forEach(v => {
-        if (!Number.isFinite(v)) return;
-        let idx = Math.floor((v - min) / width);
-        if (idx < 0) idx = 0;
-        if (idx >= binCount) idx = binCount - 1;
-        counts[idx] += 1;
-      });
-      const labels = counts.map((_, i) => {
-        const a = edges[i];
-        const b = edges[i+1] - eps;
-        return `${a.toFixed(2)}–${b.toFixed(2)}`;
-      });
-      return { labels, counts };
-    }
-
-    let histogramChart = null;
-
-    function renderHistogram(values) {
-      const { labels, counts } = makeHistogram(values, 20);
-      const ctx = document.getElementById('entropyHistogram').getContext('2d');
-      if (histogramChart) histogramChart.destroy();
-
-      histogramChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Players per bin',
-            data: counts,
-            backgroundColor: 'rgba(79, 140, 255, 0.65)',
-            borderColor: 'rgba(79, 140, 255, 1)',
-            borderWidth: 1.2
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              title: { display: true, text: 'Outcome entropy (nats)', color: '#cfe1ff' },
-              ticks: { color: '#cfe1ff' },
-              grid: { color: 'rgba(255,255,255,0.06)' }
-            },
-            y: {
-              title: { display: true, text: 'Player count', color: '#cfe1ff' },
-              beginAtZero: true,
-              ticks: { color: '#cfe1ff' },
-              grid: { color: 'rgba(255,255,255,0.06)' }
-            }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: { mode: 'index', intersect: false },
-            title: {
-              display: true,
-              text: 'Histogram of Player Entropies',
-              color: '#e8ecf8',
-              padding: { top: 4, bottom: 6 }
-            },
-            subtitle: {
-              display: true,
-              text: 'Computed from current entropy_players.csv',
-              color: '#a9b1c7',
-              padding: { bottom: 8 }
-            }
-          }
-        }
       });
     }
 
@@ -346,10 +255,6 @@
             <div><h3 style="margin-top:0;">Top 5 Entropy</h3><ol>${top.map(li).join('')}</ol></div>
             <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${bot.map(li).join('')}</ol></div>
           </div>`;
-
-        const entropyValues = players.map(p => Number(p.entropy)).filter(Number.isFinite);
-        renderHistogram(entropyValues);
-
       } else {
         document.getElementById('players-count').textContent = "0";
         summaryHTML = `<p>No player data loaded. Ensure <code>entropy_players.csv</code> is present.</p>`;
