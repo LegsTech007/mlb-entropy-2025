@@ -1,220 +1,133 @@
-<script>
-  function loadCSV(url) {
-    // cache-bust so GitHub Pages/CDN doesn't serve an old CSV
-    const withBuster = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
-    return new Promise((resolve, reject) => {
-      Papa.parse(withBuster, {
-        download: true,
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: (results) => resolve(results.data || []),
-        error: (err) => reject(err)
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>MLB 2025 — Outcome Entropy</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-dt@2/css/dataTables.dataTables.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/datatables.net@2/js/dataTables.min.js"></script>
+
+  <!-- Papa Parse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    h1 { margin-bottom: 4px; }
+    .muted { color:#666; margin-top:0; }
+    .grid { display:grid; gap:32px; }
+    .card { background:#fff; border:1px solid #eee; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,.03); }
+    table.dataTable { width:100% !important; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:999px; background:#f3f4f6; margin-left:6px; font-size:12px; }
+    .downloads a { margin-right:12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MLB 2025 — Outcome Entropy</h1>
+    <p class="muted">Diversity of plate appearance outcomes by player and team (higher = more varied outcomes).</p>
+    <div class="downloads">
+      <strong>Download CSVs:</strong>
+      <a href="entropy_players.csv" download>Players</a>
+      <a href="entropy_teams.csv" download>Teams</a>
+    </div>
+  </header>
+
+  <section class="grid">
+    <div class="card">
+      <h2>Players <span id="players-count" class="badge"></span></h2>
+      <table id="players" class="display"></table>
+    </div>
+
+    <div class="card">
+      <h2>Teams <span id="teams-count" class="badge"></span></h2>
+      <table id="teams" class="display"></table>
+    </div>
+
+    <div class="card">
+      <h2>Summary</h2>
+      <div id="summary"></div>
+    </div>
+  </section>
+
+  <script>
+    // simple CSV loader with cache-buster
+    function loadCSV(url) {
+      const u = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+      return new Promise((resolve, reject) => {
+        Papa.parse(u, {
+          download: true,
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          complete: res => resolve(res.data || []),
+          error: err => reject(err)
+        });
       });
-    });
-  }
-
-  // normalize keys to lower-case, trimmed
-  function normalizeKeys(rows) {
-    return rows.map(row =>
-      Object.fromEntries(
-        Object.entries(row).map(([k, v]) => [String(k).trim().toLowerCase(), v])
-      )
-    );
-  }
-
-  function firstNonEmpty(row, keys) {
-    for (const k of keys) {
-      const v = row[k];
-      if (v !== undefined && v !== null && String(v).trim() !== "") return v;
-    }
-    return "";
-  }
-
-  function num(row, ...keys) {
-    const v = firstNonEmpty(row, keys);
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
-
-  function renderTable(elemId, data, columns) {
-    const $table = $('#' + elemId);
-    $table.DataTable({
-      data,
-      columns,
-      pageLength: 25,
-      deferRender: true,
-      order: [],
-      autoWidth: false
-    });
-  }
-
-  function fmt(n, d=3) {
-    if (n === null || n === undefined || isNaN(n)) return '';
-    return Number(n).toFixed(d);
-  }
-
-  async function main() {
-    // Load and normalize
-    const rawPlayers = await loadCSV('entropy_players.csv').catch(() => []);
-    const rawTeams   = await loadCSV('entropy_teams.csv').catch(() => []);
-    const playersN   = normalizeKeys(rawPlayers);
-    const teamsN     = normalizeKeys(rawTeams);
-
-    // Build a clean players array with canonical fields
-    const players = playersN.map(r => ({
-      player:  firstNonEmpty(r, ['player','player_name']),
-      team:    firstNonEmpty(r, ['team','team_abbrev','team_name','team_id']),
-      PA:      num(r, 'pa', 'PA'),
-      AB:      num(r, 'ab', 'AB'),
-      entropy: num(r, 'entropy')
-    })).filter(p => p.player !== ""); // keep only rows with a name
-
-    // Debug (optional): see what keys exist if still empty
-    // console.log("Players sample row:", playersN[0]); 
-
-    if (players.length) {
-      document.getElementById('players-count').textContent = players.length + " qualified";
-      const playerCols = [
-        { title: 'player',  data: 'player' },
-        { title: 'team',    data: 'team' },
-        { title: 'PA',      data: 'PA' },
-        { title: 'AB',      data: 'AB' },
-        { title: 'entropy', data: 'entropy', render: (d)=>fmt(d) }
-      ];
-      renderTable('players', players, playerCols);
-    } else {
-      document.querySelector('div.card:nth-of-type(1)').innerHTML += "<p>No player results found. Check CSV headers.</p>";
     }
 
-    if (teamsN.length) {
-      document.getElementById('teams-count').textContent =
-        new Set(teamsN.map(t => (t.team_abbrev || t.team_name || t.team_id || '')).filter(Boolean)).size + " teams";
-
-      const teams = teamsN; // already normalized; rely on your CSV headers
-      const teamCols = [
-        'team_abbrev','team_name','qualified_players','team_pa',
-        'team_avg_entropy','team_pa_weighted_entropy','team_aggregate_entropy'
-      ].filter(c => teams[0]?.hasOwnProperty(c))
-       .map(c => ({
-         title: c,
-         data: c,
-         render: (val) => (String(c).includes('entropy') ? fmt(val) : val)
-       }));
-
-      renderTable('teams', teams, teamCols);
-    } else {
-      document.querySelector('div.card:nth-of-type(2)').innerHTML += "<p>No team results found.</p>";
-    }
-
-    // Summary card
-    const summary = document.getElementById('summary');
-    if (players.length) {
-      const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
-      const top = sorted.slice(0,5);
-      const bot = sorted.slice(-5).reverse();
-      const topList = top.map(p => `<li>${p.player} (${p.team}) — ${fmt(p.entropy)}</li>`).join('');
-      const botList = bot.map(p => `<li>${p.player} (${p.team}) — ${fmt(p.entropy)}</li>`).join('');
-      summary.innerHTML = `
-        <p><strong>Qualified players:</strong> ${players.length}</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div><h3 style="margin-top:0;">Top 5 Entropy</h3><ol>${topList}</ol></div>
-          <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${botList}</ol></div>
-        </div>
-        <p class="muted">Accepts either <code>player</code> or <code>player_name</code> in the CSV.</p>
-      `;
-    } else {
-      summary.innerHTML = `<p>Populate <code>entropy_players.csv</code> to see summaries.</p>`;
-    }
-  }
-<div id="debug" style="font:12px/1.4 system-ui; color:#444; margin:8px 0;"></div>
-<script>
-  // --- helpers (robust) ---
-  function stripBOM(s){ return typeof s==='string' ? s.replace(/^\uFEFF/, '') : s; }
-
-  function papa(url) {
-    const bust = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
-    return new Promise((resolve, reject) => {
-      Papa.parse(bust, {
-        download: true,
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: r => resolve(r.data || []),
-        error: err => reject(err)
+    function renderTable(id, data, columns) {
+      $('#' + id).DataTable({
+        data,
+        columns,
+        pageLength: 25,
+        deferRender: true,
+        order: [],
+        autoWidth: false
       });
-    });
-  }
+    }
 
-  function normalizeKeys(rows) {
-    return rows.map(row => {
-      const out = {};
-      for (const [k, v] of Object.entries(row)) {
-        const nk = stripBOM(String(k)).trim().toLowerCase(); // strip BOM + trim + lowercase
-        out[nk] = v;
+    function fmt(n, d=3){ return (n==null || isNaN(n)) ? "" : Number(n).toFixed(d); }
+
+    async function main() {
+      // ---- Players (REQUIRES headers: player, team, PA, AB, entropy) ----
+      const players = await loadCSV('entropy_players.csv');
+      if (players.length) {
+        document.getElementById('players-count').textContent = players.length + " qualified";
+        renderTable('players', players, [
+          { title:'player',  data:'player' },
+          { title:'team',    data:'team' },
+          { title:'PA',      data:'PA' },
+          { title:'AB',      data:'AB' },
+          { title:'entropy', data:'entropy', render:(d)=>fmt(d) }
+        ]);
+
+        // Summary
+        const sorted = [...players].sort((a,b) => (b.entropy ?? -1) - (a.entropy ?? -1));
+        const top = sorted.slice(0,5);
+        const bot = sorted.slice(-5).reverse();
+        const li = x => `<li>${x.player} (${x.team}) — ${fmt(x.entropy)}</li>`;
+        document.getElementById('summary').innerHTML = `
+          <p><strong>Qualified players:</strong> ${players.length}</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div><h3 style="margin-top:0;">Top 5 Entropy</h3><ol>${top.map(li).join('')}</ol></div>
+            <div><h3 style="margin-top:0;">Bottom 5 Entropy</h3><ol>${bot.map(li).join('')}</ol></div>
+          </div>`;
+      } else {
+        document.getElementById('players-count').textContent = "0";
       }
-      return out;
-    });
-  }
 
-  function firstNonEmpty(row, keys) {
-    for (const k of keys) {
-      const v = row[k];
-      if (v !== undefined && v !== null && String(v).trim() !== "") return v;
+      // ---- Teams (optional; shown if file present) ----
+      let teams = [];
+      try { teams = await loadCSV('entropy_teams.csv'); } catch {}
+      if (teams.length) {
+        document.getElementById('teams-count').textContent =
+          new Set(teams.map(t => t.team_abbrev || t.team_name || t.team_id || '')).size + " teams";
+
+        const teamCols = [
+          "team_abbrev","team_name","qualified_players","team_PA",
+          "team_avg_entropy","team_pa_weighted_entropy","team_aggregate_entropy"
+        ].filter(c => teams[0]?.hasOwnProperty(c))
+         .map(c => ({ title:c, data:c, render: (v)=> (String(c).includes('entropy') ? fmt(v) : v) }));
+
+        renderTable('teams', teams, teamCols);
+      } else {
+        document.getElementById('teams-count').textContent = "—";
+      }
     }
-    return "";
-  }
-  function num(v){ const n = Number(v); return Number.isFinite(n) ? n : null; }
-  function fmt(n, d=3){ return n==null ? "" : Number(n).toFixed(d); }
-
-  function renderTable(elemId, data, columns) {
-    if (!$.fn || !$.fn.DataTable) {
-      document.getElementById('debug').innerHTML += "<div style='color:#b91c1c'>DataTables didn't load. Check the CDN URLs.</div>";
-      return;
-    }
-    $('#' + elemId).DataTable({ data, columns, pageLength:25, deferRender:true, order:[], autoWidth:false });
-  }
-
-  async function main() {
-    const debug = document.getElementById('debug');
-
-    // Load your exact filename
-    const playersRaw = await papa('entropy_players.csv').catch(e => {
-      debug.innerHTML += `<div style="color:#b91c1c">Error loading entropy_players.csv: ${e}</div>`;
-      return [];
-    });
-
-    const playersN = normalizeKeys(playersRaw);
-    debug.innerHTML += `<div>Loaded players rows: <b>${playersN.length}</b></div>`;
-    if (playersN[0]) {
-      debug.innerHTML += `<div>First row keys: ${Object.keys(playersN[0]).join(', ')}</div>`;
-    }
-
-    const players = playersN.map(r => ({
-      player:  firstNonEmpty(r, ['player','player_name']),
-      team:    firstNonEmpty(r, ['team','team_abbrev','team_name','team_id']),
-      PA:      num(r['pa']),
-      AB:      num(r['ab']),
-      entropy: num(r['entropy'])
-    })).filter(p => p.player !== "");
-
-    if (players.length === 0) {
-      debug.innerHTML += `<div style="color:#b91c1c">No playable rows after normalization. Check header names and that the CSV isn’t empty.</div>`;
-    } else {
-      document.getElementById('players-count').textContent = players.length + " qualified";
-      renderTable('players', players, [
-        { title: 'player',  data: 'player' },
-        { title: 'team',    data: 'team' },
-        { title: 'PA',      data: 'PA' },
-        { title: 'AB',      data: 'AB' },
-        { title: 'entropy', data: 'entropy', render: d => fmt(d) }
-      ]);
-    }
-  }
-  main();
-</script>
-
-
-
-  main();
-</script>
+    main();
+  </script>
+</body>
+</html>
