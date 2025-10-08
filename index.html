@@ -97,13 +97,13 @@
       if (players.length) {
         document.getElementById('players-count').textContent = players.length + " qualified";
         // Nice column order if present
-        const playerCols = ["player_name","player_id","team_abbrev","PA","AB","entropy"]
-          .filter(c => players[0].hasOwnProperty(c))
-          .map(c => ({
-            title: c,
-            data: c,
-            render: (data, type, row) => (c === "entropy" ? fmt(data) : data)
-          }));
+        const playerCols = ["player","team","PA","AB","entropy"]
+            .filter(c => players[0]?.hasOwnProperty(c))
+            .map(c => ({
+                title: c,
+                data: c,
+                render: (data) => (c === "entropy" ? fmt(data) : data)
+            }));  
         renderTable('players', players, playerCols);
       } else {
         document.querySelector('div.card:nth-of-type(1)').innerHTML += "<p>No player results found.</p>";

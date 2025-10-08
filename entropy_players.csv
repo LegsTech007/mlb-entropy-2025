@@ -1,147 +1,147 @@
-player_id,player_name,team_id,team_name,team_abbrev,PA,AB,entropy
-702332,Caleb Durbin,158,Milwaukee Brewers,,514,452,2.409095127697777
-608070,José Ramírez,114,Cleveland Guardians,,677,598,2.3853743610707583
-514888,Jose Altuve,117,Houston Astros,,654,588,2.3836786488477326
-672695,Geraldo Perdomo,109,Arizona Diamondbacks,,724,602,2.3755312549475844
-677951,Bobby Witt Jr.,118,Kansas City Royals,,687,623,2.373702557593051
-691406,Junior Caminero,139,Tampa Bay Rays,,653,602,2.3611595681107476
-665742,Juan Soto,121,New York Mets,,716,578,2.3550462615371797
-624413,Pete Alonso,121,New York Mets,,709,624,2.3496119426469257
-694384,Nolan Schanuel,108,Los Angeles Angels,,563,487,2.33857637829477
-593428,Xander Bogaerts,135,San Diego Padres,,553,492,2.335817743381896
-592450,Aaron Judge,147,New York Yankees,,688,548,2.3343061670144567
-682663,Agustín Ramírez,146,Miami Marlins,,585,537,2.3330760969947444
-686469,Vinnie Pasquantino,118,Kansas City Royals,,682,621,2.3323751662020857
-543807,George Springer,141,Toronto Blue Jays,,596,506,2.328979416584038
-665489,Vladimir Guerrero Jr.,141,Toronto Blue Jays,,690,598,2.327527628532839
-678882,Ceddanne Rafaela,111,Boston Red Sox,,590,549,2.3270663647143084
-670770,TJ Friedl,113,Cincinnati Reds,,699,587,2.3269298075892766
-682998,Corbin Carroll,109,Arizona Diamondbacks,,643,565,2.325948739437794
-687401,Joey Ortiz,158,Milwaukee Brewers,,514,476,2.3198478596643892
-666971,Lourdes Gurriel Jr.,109,Arizona Diamondbacks,,550,504,2.318012757742972
-596019,Francisco Lindor,121,New York Mets,,732,644,2.31778647761624
-694192,Jackson Chourio,158,Milwaukee Brewers,,596,556,2.3163792638211347
-573262,Mike Yastrzemski,118,Kansas City Royals,,558,477,2.3146032007008785
-606466,Ketel Marte,109,Arizona Diamondbacks,,560,484,2.3143800968462642
-676391,Ernie Clement,141,Toronto Blue Jays,,596,552,2.3140283110956923
-630105,Jake Cronenworth,135,San Diego Padres,,516,420,2.313307169654994
-656716,Zach McKinstry,116,Detroit Tigers,,520,460,2.3108475454304873
-683002,Gunnar Henderson,110,Baltimore Orioles,,651,577,2.310595738572971
-656305,Matt Chapman,137,San Francisco Giants,,536,455,2.310545797886214
-691718,Pete Crow-Armstrong,112,Chicago Cubs,,655,599,2.3095641240174674
-641355,Cody Bellinger,147,New York Yankees,,665,595,2.3094237360037155
-677594,Julio Rodríguez,136,Seattle Mariners,,719,661,2.3087611354174657
-686217,Sal Frelick,158,Milwaukee Brewers,,603,536,2.3076392616378842
-665161,Jeremy Peña,117,Houston Astros,,543,493,2.3043325066704634
-593871,Jorge Polanco,136,Seattle Mariners,,532,479,2.3036722077378777
-657757,Gavin Sheets,135,San Diego Padres,,546,493,2.302245311681684
-667670,Brent Rooker,133,Athletics,,699,626,2.3020485806209363
-700250,Ben Rice,147,New York Yankees,,539,475,2.3019356691377615
-668227,Randy Arozarena,136,Seattle Mariners,,718,621,2.2986324665621374
-592518,Manny Machado,135,San Diego Padres,,678,615,2.2963824817178966
-672580,Maikel Garcia,118,Kansas City Royals,,666,595,2.2948840074282737
-669127,Shea Langeliers,133,Athletics,,522,480,2.294490890981887
-605141,Mookie Betts,119,Los Angeles Dodgers,,672,598,2.2933772637641074
-663656,Kyle Tucker,112,Chicago Cubs,,605,506,2.291888296167832
-543760,Marcus Semien,140,Texas Rangers,,534,470,2.288589247329567
-661388,William Contreras,158,Milwaukee Brewers,,669,576,2.2885803437322783
-521692,Salvador Perez,118,Kansas City Royals,,641,597,2.286448638131188
-683011,Anthony Volpe,147,New York Yankees,,604,547,2.284353458696681
-678246,Miguel Vargas,145,Chicago White Sox,,569,504,2.2813533259886283
-518692,Freddie Freeman,119,Los Angeles Dodgers,,635,563,2.2811981486304087
-805367,Chase Meidroth,145,Chicago White Sox,,505,450,2.2810868801210513
-575929,Willson Contreras,138,St. Louis Cardinals,,563,490,2.2809146401627682
-645277,Ozzie Albies,144,Atlanta Braves,,671,607,2.277560004308949
-672640,Otto Lopez,146,Miami Marlins,,594,544,2.2766004950376697
-660271,Shohei Ohtani,119,Los Angeles Dodgers,,737,620,2.2744817442909544
-680718,Addison Barger,141,Toronto Blue Jays,,506,464,2.273313991200218
-676475,Alec Burleson,138,St. Louis Cardinals,,546,497,2.2727130957481223
-607208,Trea Turner,143,Philadelphia Phillies,,648,596,2.271087846339368
-621493,Taylor Ward,108,Los Angeles Angels,,663,579,2.268553271268135
-666176,Jo Adell,108,Los Angeles Angels,,573,526,2.268018797224819
-605137,Josh Bell,120,Washington Nationals,,533,468,2.26773494439172
-680776,Jarren Duran,111,Boston Red Sox,,700,624,2.2674724912621507
-672386,Alejandro Kirk,141,Toronto Blue Jays,,515,460,2.2651925976405063
-679529,Spencer Torkelson,116,Detroit Tigers,,658,570,2.2646174409710977
-621439,Byron Buxton,142,Minnesota Twins,,542,488,2.263026967278757
-650490,Yandy Díaz,139,Tampa Bay Rays,,651,583,2.2617648616990125
-687263,Zach Neto,108,Los Angeles Angels,,554,502,2.2606973921261386
-656811,Ryan O'Hearn,135,San Diego Padres,,544,474,2.26061901469655
-691026,Masyn Winn,138,St. Louis Cardinals,,537,491,2.2593471551520214
-457705,Andrew McCutchen,134,Pittsburgh Pirates,,551,477,2.258849501691637
-669701,Josh Smith,140,Texas Rangers,,563,495,2.257643728459176
-681624,Andy Pages,119,Los Angeles Dodgers,,632,590,2.2575978458559076
-668715,Spencer Steer,113,Cincinnati Reds,,580,518,2.257575475972835
-700932,Kyle Manzardo,114,Cleveland Guardians,,535,473,2.2572753060378385
-647304,Josh Naylor,136,Seattle Mariners,,613,551,2.256216654971409
-671277,Luis García Jr.,120,Washington Nationals,,526,488,2.2561692747678173
-592206,Nick Castellanos,143,Philadelphia Phillies,,595,553,2.2556975543673037
-663728,Cal Raleigh,136,Seattle Mariners,,714,605,2.254124274965329
-673548,Seiya Suzuki,112,Chicago Cubs,,659,578,2.252788541711084
-592663,J.T. Realmuto,143,Philadelphia Phillies,,558,510,2.252636353626869
-680977,Brendan Donovan,138,St. Louis Cardinals,,515,460,2.2521026440841947
-671218,Heliot Ramos,137,San Francisco Giants,,695,620,2.251860035693029
-665487,Fernando Tatis Jr.,135,San Diego Padres,,691,594,2.251401406590208
-694671,Wyatt Langford,140,Texas Rangers,,573,489,2.2494661638655753
-696100,Hunter Goodman,115,Colorado Rockies,,579,540,2.248767126016288
-676572,Eric Wagaman,146,Miami Marlins,,514,476,2.2487379266172556
-672820,Lenyn Sosa,145,Chicago White Sox,,544,518,2.2484733542869835
-553993,Eugenio Suárez,136,Seattle Mariners,,670,601,2.246818314815739
-663647,Ke'Bryan Hayes,113,Cincinnati Reds,,574,531,2.2463850918020642
-663616,Trevor Larnach,142,Minnesota Twins,,571,507,2.2437806700281917
-666182,Bo Bichette,141,Toronto Blue Jays,,628,582,2.243266796433803
-682928,CJ Abrams,120,Washington Nationals,,636,581,2.242000458469362
-664056,Harrison Bader,143,Philadelphia Phillies,,508,452,2.2417910023759697
-621020,Dansby Swanson,112,Chicago Cubs,,653,598,2.2416089221140045
-669364,Xavier Edwards,146,Miami Marlins,,620,562,2.240728454381647
-673237,Yainer Diaz,117,Houston Astros,,567,542,2.239841869449607
-607043,Brandon Nimmo,121,New York Mets,,652,587,2.2369315543120916
-665862,Jazz Chisholm Jr.,147,New York Yankees,,539,470,2.236760814687621
-547180,Bryce Harper,143,Philadelphia Phillies,,588,508,2.2344093973027768
-663697,Jonathan India,118,Kansas City Royals,,567,497,2.2337371710958056
-642715,Willy Adames,137,San Francisco Giants,,686,591,2.232270211709946
-671739,Michael Harris II,144,Atlanta Braves,,645,615,2.231799430189296
-681082,Bryson Stott,143,Philadelphia Phillies,,566,505,2.231040558805966
-621043,Carlos Correa,117,Houston Astros,,585,538,2.2294495414135866
-663538,Nico Hoerner,112,Chicago Cubs,,657,607,2.228955556062755
-686668,Brenton Doyle,115,Colorado Rockies,,538,502,2.2273201141391845
-664023,Ian Happ,112,Chicago Cubs,,671,577,2.226670141679427
-691016,Tyler Soderstrom,133,Athletics,,624,561,2.22553348153393
-606192,Teoscar Hernández,119,Los Angeles Dodgers,,554,518,2.22537340647831
-542303,Marcell Ozuna,144,Atlanta Braves,,592,487,2.225318765726049
-808982,Jung Hoo Lee,137,San Francisco Giants,,617,560,2.2244625138580623
-572233,Christian Walker,117,Houston Astros,,640,585,2.223702088166132
-805779,Jacob Wilson,133,Athletics,,523,486,2.223013658943643
-666969,Adolis García,140,Texas Rangers,,547,507,2.2223867867348845
-682829,Elly De La Cruz,113,Cincinnati Reds,,710,640,2.22160778960418
-650402,Gleyber Torres,116,Detroit Tigers,,637,540,2.2188294799262107
-680757,Steven Kwan,114,Cleveland Guardians,,697,629,2.217732951741659
-664761,Alec Bohm,143,Philadelphia Phillies,,512,470,2.2170919257345245
-646240,Rafael Devers,137,San Francisco Giants,,729,607,2.2137312894763532
-502671,Paul Goldschmidt,147,New York Yankees,,536,491,2.2126678235454182
-621566,Matt Olson,144,Atlanta Braves,,728,629,2.209649140448661
-663457,Lars Nootbaar,138,St. Louis Cardinals,,583,509,2.2043740540356027
-663757,Trent Grisham,147,New York Yankees,,590,502,2.2040234919161272
-686797,Brooks Lee,142,Minnesota Twins,,532,493,2.2027161443474763
-656941,Kyle Schwarber,143,Philadelphia Phillies,,732,611,2.196273193446155
-680574,Matt McLain,113,Cincinnati Reds,,590,521,2.194508421445051
-641487,J.P. Crawford,136,Seattle Mariners,,661,577,2.191569877934612
-683737,Michael Busch,112,Chicago Cubs,,598,530,2.1913625717344343
-664040,Brandon Lowe,139,Tampa Bay Rays,,553,507,2.1881905197645524
-596115,Trevor Story,111,Boston Red Sox,,658,616,2.1829265475407826
-650859,Luis Rengifo,108,Los Angeles Angels,,541,501,2.1813995798612096
-668930,Brice Turang,158,Milwaukee Brewers,,668,594,2.178238259418163
-663993,Nathaniel Lowe,111,Boston Red Sox,,609,540,2.176651502041363
-545361,Mike Trout,108,Los Angeles Angels,,556,457,2.175248144193395
-650333,Luis Arraez,135,San Diego Padres,,675,620,2.164830635697521
-668804,Bryan Reynolds,134,Pittsburgh Pirates,,654,587,2.1632687962093824
-673962,Josh Jung,140,Texas Rangers,,511,482,2.1613508408586393
-665833,Oneil Cruz,134,Pittsburgh Pirates,,545,472,2.155990485162091
-592885,Christian Yelich,158,Milwaukee Brewers,,653,582,2.14685951529337
-682985,Riley Greene,116,Detroit Tigers,,664,609,2.145644169304477
-687597,Jordan Beck,115,Colorado Rockies,,588,539,2.1434475102857835
-702616,Jackson Holliday,110,Baltimore Orioles,,649,586,2.1355400173285406
-641857,Ryan McMahon,147,New York Yankees,,593,516,2.117941400884782
-671732,Lawrence Butler,133,Athletics,,630,569,2.098820664345864
-666158,Gavin Lux,113,Cincinnati Reds,,510,452,2.0801488730650255
-695578,James Wood,120,Washington Nationals,,689,598,2.0601795962330645
+player,team,PA,AB,entropy
+Caleb Durbin,Milwaukee Brewers,514,452,2.409095127697777
+José Ramírez,Cleveland Guardians,677,598,2.3853743610707583
+Jose Altuve,Houston Astros,654,588,2.3836786488477326
+Geraldo Perdomo,Arizona Diamondbacks,724,602,2.3755312549475844
+Bobby Witt Jr.,Kansas City Royals,687,623,2.373702557593051
+Junior Caminero,Tampa Bay Rays,653,602,2.3611595681107476
+Juan Soto,New York Mets,716,578,2.3550462615371797
+Pete Alonso,New York Mets,709,624,2.3496119426469257
+Nolan Schanuel,Los Angeles Angels,563,487,2.33857637829477
+Xander Bogaerts,San Diego Padres,553,492,2.335817743381896
+Aaron Judge,New York Yankees,688,548,2.3343061670144567
+Agustín Ramírez,Miami Marlins,585,537,2.3330760969947444
+Vinnie Pasquantino,Kansas City Royals,682,621,2.3323751662020857
+George Springer,Toronto Blue Jays,596,506,2.328979416584038
+Vladimir Guerrero Jr.,Toronto Blue Jays,690,598,2.327527628532839
+Ceddanne Rafaela,Boston Red Sox,590,549,2.3270663647143084
+TJ Friedl,Cincinnati Reds,699,587,2.3269298075892766
+Corbin Carroll,Arizona Diamondbacks,643,565,2.325948739437794
+Joey Ortiz,Milwaukee Brewers,514,476,2.3198478596643892
+Lourdes Gurriel Jr.,Arizona Diamondbacks,550,504,2.318012757742972
+Francisco Lindor,New York Mets,732,644,2.31778647761624
+Jackson Chourio,Milwaukee Brewers,596,556,2.3163792638211347
+Mike Yastrzemski,Kansas City Royals,558,477,2.3146032007008785
+Ketel Marte,Arizona Diamondbacks,560,484,2.3143800968462642
+Ernie Clement,Toronto Blue Jays,596,552,2.3140283110956923
+Jake Cronenworth,San Diego Padres,516,420,2.313307169654994
+Zach McKinstry,Detroit Tigers,520,460,2.3108475454304873
+Gunnar Henderson,Baltimore Orioles,651,577,2.310595738572971
+Matt Chapman,San Francisco Giants,536,455,2.310545797886214
+Pete Crow-Armstrong,Chicago Cubs,655,599,2.3095641240174674
+Cody Bellinger,New York Yankees,665,595,2.3094237360037155
+Julio Rodríguez,Seattle Mariners,719,661,2.3087611354174657
+Sal Frelick,Milwaukee Brewers,603,536,2.3076392616378842
+Jeremy Peña,Houston Astros,543,493,2.3043325066704634
+Jorge Polanco,Seattle Mariners,532,479,2.3036722077378777
+Gavin Sheets,San Diego Padres,546,493,2.302245311681684
+Brent Rooker,Athletics,699,626,2.3020485806209363
+Ben Rice,New York Yankees,539,475,2.3019356691377615
+Randy Arozarena,Seattle Mariners,718,621,2.2986324665621374
+Manny Machado,San Diego Padres,678,615,2.2963824817178966
+Maikel Garcia,Kansas City Royals,666,595,2.2948840074282737
+Shea Langeliers,Athletics,522,480,2.294490890981887
+Mookie Betts,Los Angeles Dodgers,672,598,2.2933772637641074
+Kyle Tucker,Chicago Cubs,605,506,2.291888296167832
+Marcus Semien,Texas Rangers,534,470,2.288589247329567
+William Contreras,Milwaukee Brewers,669,576,2.2885803437322783
+Salvador Perez,Kansas City Royals,641,597,2.286448638131188
+Anthony Volpe,New York Yankees,604,547,2.284353458696681
+Miguel Vargas,Chicago White Sox,569,504,2.2813533259886283
+Freddie Freeman,Los Angeles Dodgers,635,563,2.2811981486304087
+Chase Meidroth,Chicago White Sox,505,450,2.2810868801210513
+Willson Contreras,St. Louis Cardinals,563,490,2.2809146401627682
+Ozzie Albies,Atlanta Braves,671,607,2.277560004308949
+Otto Lopez,Miami Marlins,594,544,2.2766004950376697
+Shohei Ohtani,Los Angeles Dodgers,737,620,2.2744817442909544
+Addison Barger,Toronto Blue Jays,506,464,2.273313991200218
+Alec Burleson,St. Louis Cardinals,546,497,2.2727130957481223
+Trea Turner,Philadelphia Phillies,648,596,2.271087846339368
+Taylor Ward,Los Angeles Angels,663,579,2.268553271268135
+Jo Adell,Los Angeles Angels,573,526,2.268018797224819
+Josh Bell,Washington Nationals,533,468,2.26773494439172
+Jarren Duran,Boston Red Sox,700,624,2.2674724912621507
+Alejandro Kirk,Toronto Blue Jays,515,460,2.2651925976405063
+Spencer Torkelson,Detroit Tigers,658,570,2.2646174409710977
+Byron Buxton,Minnesota Twins,542,488,2.263026967278757
+Yandy Díaz,Tampa Bay Rays,651,583,2.2617648616990125
+Zach Neto,Los Angeles Angels,554,502,2.2606973921261386
+Ryan O'Hearn,San Diego Padres,544,474,2.26061901469655
+Masyn Winn,St. Louis Cardinals,537,491,2.2593471551520214
+Andrew McCutchen,Pittsburgh Pirates,551,477,2.258849501691637
+Josh Smith,Texas Rangers,563,495,2.257643728459176
+Andy Pages,Los Angeles Dodgers,632,590,2.2575978458559076
+Spencer Steer,Cincinnati Reds,580,518,2.257575475972835
+Kyle Manzardo,Cleveland Guardians,535,473,2.2572753060378385
+Josh Naylor,Seattle Mariners,613,551,2.256216654971409
+Luis García Jr.,Washington Nationals,526,488,2.2561692747678173
+Nick Castellanos,Philadelphia Phillies,595,553,2.2556975543673037
+Cal Raleigh,Seattle Mariners,714,605,2.254124274965329
+Seiya Suzuki,Chicago Cubs,659,578,2.252788541711084
+J.T. Realmuto,Philadelphia Phillies,558,510,2.252636353626869
+Brendan Donovan,St. Louis Cardinals,515,460,2.2521026440841947
+Heliot Ramos,San Francisco Giants,695,620,2.251860035693029
+Fernando Tatis Jr.,San Diego Padres,691,594,2.251401406590208
+Wyatt Langford,Texas Rangers,573,489,2.2494661638655753
+Hunter Goodman,Colorado Rockies,579,540,2.248767126016288
+Eric Wagaman,Miami Marlins,514,476,2.2487379266172556
+Lenyn Sosa,Chicago White Sox,544,518,2.2484733542869835
+Eugenio Suárez,Seattle Mariners,670,601,2.246818314815739
+Ke'Bryan Hayes,Cincinnati Reds,574,531,2.2463850918020642
+Trevor Larnach,Minnesota Twins,571,507,2.2437806700281917
+Bo Bichette,Toronto Blue Jays,628,582,2.243266796433803
+CJ Abrams,Washington Nationals,636,581,2.242000458469362
+Harrison Bader,Philadelphia Phillies,508,452,2.2417910023759697
+Dansby Swanson,Chicago Cubs,653,598,2.2416089221140045
+Xavier Edwards,Miami Marlins,620,562,2.240728454381647
+Yainer Diaz,Houston Astros,567,542,2.239841869449607
+Brandon Nimmo,New York Mets,652,587,2.2369315543120916
+Jazz Chisholm Jr.,New York Yankees,539,470,2.236760814687621
+Bryce Harper,Philadelphia Phillies,588,508,2.2344093973027768
+Jonathan India,Kansas City Royals,567,497,2.2337371710958056
+Willy Adames,San Francisco Giants,686,591,2.232270211709946
+Michael Harris II,Atlanta Braves,645,615,2.231799430189296
+Bryson Stott,Philadelphia Phillies,566,505,2.231040558805966
+Carlos Correa,Houston Astros,585,538,2.2294495414135866
+Nico Hoerner,Chicago Cubs,657,607,2.228955556062755
+Brenton Doyle,Colorado Rockies,538,502,2.2273201141391845
+Ian Happ,Chicago Cubs,671,577,2.226670141679427
+Tyler Soderstrom,Athletics,624,561,2.22553348153393
+Teoscar Hernández,Los Angeles Dodgers,554,518,2.22537340647831
+Marcell Ozuna,Atlanta Braves,592,487,2.225318765726049
+Jung Hoo Lee,San Francisco Giants,617,560,2.2244625138580623
+Christian Walker,Houston Astros,640,585,2.223702088166132
+Jacob Wilson,Athletics,523,486,2.223013658943643
+Adolis García,Texas Rangers,547,507,2.2223867867348845
+Elly De La Cruz,Cincinnati Reds,710,640,2.22160778960418
+Gleyber Torres,Detroit Tigers,637,540,2.2188294799262107
+Steven Kwan,Cleveland Guardians,697,629,2.217732951741659
+Alec Bohm,Philadelphia Phillies,512,470,2.2170919257345245
+Rafael Devers,San Francisco Giants,729,607,2.2137312894763532
+Paul Goldschmidt,New York Yankees,536,491,2.2126678235454182
+Matt Olson,Atlanta Braves,728,629,2.209649140448661
+Lars Nootbaar,St. Louis Cardinals,583,509,2.2043740540356027
+Trent Grisham,New York Yankees,590,502,2.2040234919161272
+Brooks Lee,Minnesota Twins,532,493,2.2027161443474763
+Kyle Schwarber,Philadelphia Phillies,732,611,2.196273193446155
+Matt McLain,Cincinnati Reds,590,521,2.194508421445051
+J.P. Crawford,Seattle Mariners,661,577,2.191569877934612
+Michael Busch,Chicago Cubs,598,530,2.1913625717344343
+Brandon Lowe,Tampa Bay Rays,553,507,2.1881905197645524
+Trevor Story,Boston Red Sox,658,616,2.1829265475407826
+Luis Rengifo,Los Angeles Angels,541,501,2.1813995798612096
+Brice Turang,Milwaukee Brewers,668,594,2.178238259418163
+Nathaniel Lowe,Boston Red Sox,609,540,2.176651502041363
+Mike Trout,Los Angeles Angels,556,457,2.175248144193395
+Luis Arraez,San Diego Padres,675,620,2.164830635697521
+Bryan Reynolds,Pittsburgh Pirates,654,587,2.1632687962093824
+Josh Jung,Texas Rangers,511,482,2.1613508408586393
+Oneil Cruz,Pittsburgh Pirates,545,472,2.155990485162091
+Christian Yelich,Milwaukee Brewers,653,582,2.14685951529337
+Riley Greene,Detroit Tigers,664,609,2.145644169304477
+Jordan Beck,Colorado Rockies,588,539,2.1434475102857835
+Jackson Holliday,Baltimore Orioles,649,586,2.1355400173285406
+Ryan McMahon,New York Yankees,593,516,2.117941400884782
+Lawrence Butler,Athletics,630,569,2.098820664345864
+Gavin Lux,Cincinnati Reds,510,452,2.0801488730650255
+James Wood,Washington Nationals,689,598,2.0601795962330645
